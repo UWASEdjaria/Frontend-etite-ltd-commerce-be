@@ -1,5 +1,6 @@
 'use client';
 
+import { FiSearch } from 'react-icons/fi';
 import { UserFilters } from '@/lib/userFilters';
 
 interface UserFilterBarProps {
@@ -12,15 +13,18 @@ export default function UserFilterBar({ filters, onChange }: UserFilterBarProps)
 
   return (
     <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-2 flex flex-wrap items-center gap-2 shrink-0">
-      <input
-        type="text"
-        placeholder="Search name or email..."
-        value={filters.search}
-        onChange={(e) => onChange({ ...filters, search: e.target.value })}
-        className={`${inputClass} w-48`}
-        aria-label="Search users"
-        title="Search users"
-      />
+      <div className="relative">
+        <FiSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={13} />
+        <input
+          type="text"
+          placeholder="Search name or email..."
+          value={filters.search}
+          onChange={(e) => onChange({ ...filters, search: e.target.value })}
+          className={`${inputClass} pl-7 w-40 sm:w-48`}
+          aria-label="Search users"
+          title="Search users"
+        />
+      </div>
 
       <select
         value={filters.role}

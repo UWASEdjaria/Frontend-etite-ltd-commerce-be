@@ -9,6 +9,7 @@ import Link from 'next/link';
 
 const navItems = [
   { icon: FiHome, label: 'user-dashboard', href: '/user-dashboard' },
+  { icon: FiShoppingBag, label: 'Products', href: '/user-dashboard/products' },
   { icon: FiShoppingBag, label: 'Shop', href: '/shop'},
   { icon: FiPackage, label: 'My Orders', href: '/user-dashboard/orders' },
   { icon: FiHeart, label: 'Wishlist', href: '/user-dashboard/wishlist'},
