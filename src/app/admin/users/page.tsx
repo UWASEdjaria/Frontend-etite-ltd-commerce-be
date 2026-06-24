@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { authService } from '@/services/authService';
+import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminTopbar from '@/components/admin/AdminTopbar';
 import AdminStatsBar from '@/components/admin/AdminStatsBar';
 import { UserRow, InviteFormData, AdminAxiosError, FeedbackStatus } from '@/types/admin';
 import { FiEdit2, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
@@ -16,6 +18,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [feedback, setFeedback] = useState<FeedbackStatus>({ message: '', isError: false });
   const [editUser, setEditUser] = useState<Partial<UserRow> | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [filters, setFilters] = useState<UserFilters>(defaultFilters);
 
   useEffect(() => {
@@ -67,8 +70,13 @@ export default function AdminUsersPage() {
   const filteredUsers = filterUsers(users, filters);
 
   return (
-    <div className="flex flex-col h-full">
-      <AdminStatsBar
+    <div className="flex h-screen bg-slate-50">
+      <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <AdminTopbar onMenuClick={() => setSidebarOpen(true)} />
+
+        <AdminStatsBar
           total={users.length}
           verified={verified}
           admins={admins}
@@ -174,6 +182,7 @@ export default function AdminUsersPage() {
             </tbody>
           </table>
         </div>
+      </div>
     </div>
   );
 }
