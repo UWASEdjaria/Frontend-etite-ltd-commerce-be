@@ -34,7 +34,7 @@ export default function DashboardPage() {
   return (
        <>
           {/* Welcome */}
-          <div className="mb-6">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
             <h2 className="text-xl font-extrabold text-slate-900">Welcome back 👋</h2>
             <p className="text-sm text-slate-500 mt-1">Here&apos;s an overview of your account activity.</p>
           </div>

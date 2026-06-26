@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { authService } from '@/services/authService';
-import AdminSidebar from '@/components/admin/AdminSidebar';
-import AdminTopbar from '@/components/admin/AdminTopbar';
 import AdminStatsBar from '@/components/admin/AdminStatsBar';
 import { UserRow, InviteFormData, AdminAxiosError, FeedbackStatus } from '@/types/admin';
 import { FiEdit2, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
@@ -20,6 +18,8 @@ export default function AdminUsersPage() {
   const [editUser, setEditUser] = useState<Partial<UserRow> | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [filters, setFilters] = useState<UserFilters>(defaultFilters);
+  const [isLoading, setIsLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     authService.getAllUsers()
@@ -51,18 +51,31 @@ export default function AdminUsersPage() {
   };
 
   const handleToggleVerification = async (user: UserRow) => {
+    if (isLoading) return;
+    setIsLoading(true);
     try {
-      const updated = await authService.updateUser(user.id, { isVerified: !user.isVerified });
-      setUsers(users.map((u) => u.id === user.id ? { ...u, isVerified: updated.isVerified } : u));
-    } catch (e) { console.error(e); }
+      const updated = await authService.updateUser(user.id, 
+        { isVerified: !user.isVerified ,
+          status: !user.isVerified ? "ACTIVE" : "REGISTERED"
+        }as Partial<UserRow>);
+        
+      setUsers(users.map((u) => u.id === user.id ? { ...u,...updated} : u));
+    } catch (e) { 
+      console.error(e);
+    } finally {
+      setIsLoading(false); 
+    } 
   };
+  
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Permanently remove this account?')) return;
     try {
       await authService.deleteUser(id);
       setUsers(users.filter((u) => u.id !== id));
     } catch (e) { console.error(e); }
+    finally {
+      setDeletingId(null);
+    }
   };
 
   const verified = users.filter((u) => u.isVerified).length;
@@ -70,21 +83,16 @@ export default function AdminUsersPage() {
   const filteredUsers = filterUsers(users, filters);
 
   return (
-    <div className="flex h-screen bg-slate-50">
-      <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <AdminTopbar onMenuClick={() => setSidebarOpen(true)} />
-
-        <AdminStatsBar
+    <div className="flex flex-col gap-6">
+       <AdminStatsBar
           total={users.length}
           verified={verified}
           admins={admins}
           feedback={feedback}
           onUserCreated={handleUserCreated}
-        />
+       />
 
-        <UserFilterBar filters={filters} onChange={setFilters} />
+       <UserFilterBar filters={filters} onChange={setFilters} />
 
         <div className="flex-1 overflow-y-auto">
           <table className="w-full text-left text-sm text-gray-600">
@@ -151,26 +159,33 @@ export default function AdminUsersPage() {
                         <button onClick={() => setEditUser(null)} className="text-gray-400 hover:text-gray-600" title="Cancel"><FiX size={15} /></button>
                       </div>
                     ) : (
-                      <button type="button" onClick={() => handleToggleVerification(user)}
-                        className="cursor-pointer">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                          user.isVerified
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'bg-amber-50 text-amber-700'
-                        }`}>
-                          {user.isVerified ? 'Verified' : 'Pending'}
-                        </span>
-                      </button>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+                        user.status === 'ACTIVE'
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'bg-amber-50 text-amber-700'
+                      }`}>
+                         {user.status === 'ACTIVE' ? 'Verified' : 'Pending'}
+                      </span>
                     )}
                   </td>
 
                   <td className="px-4 sm:px-6 py-2.5 text-right">
                     {editUser?.id !== user.id && (
                       <div className="flex items-center justify-end gap-3">
-                        <button onClick={() => setEditUser({ id: user.id, name: user.name, email: user.email, role: user.role })}
-                          className="text-gray-400 hover:text-orange-600" title="Edit"><FiEdit2 size={15} /></button>
-                        <button type="button" onClick={() => handleDelete(user.id)}
-                          className="text-red-500 hover:text-red-700" title="Delete"><FiTrash2 size={15} /></button>
+                        {deletingId === user.id ? (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-slate-500">Delete?</span>
+                            <button onClick={() => handleDelete(user.id)} className="text-xs font-bold text-red-600 hover:underline">Yes</button>
+                            <button onClick={() => setDeletingId(null)} className="text-xs font-bold text-slate-500 hover:underline">No</button>
+                          </div>
+                        ) : (
+                          <>
+                            <button onClick={() => setEditUser({ id: user.id, name: user.name, email: user.email, role: user.role })}
+                              className="text-gray-400 hover:text-orange-600" title="Edit"><FiEdit2 size={15} /></button>
+                            <button type="button" onClick={() => setDeletingId(user.id)}
+                              className="text-red-500 hover:text-red-700" title="Delete"><FiTrash2 size={15} /></button>
+                          </>
+                        )}
                       </div>
                     )}
                   </td>
@@ -183,6 +198,5 @@ export default function AdminUsersPage() {
           </table>
         </div>
       </div>
-    </div>
   );
 }
