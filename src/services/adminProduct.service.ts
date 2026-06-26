@@ -8,7 +8,7 @@ const getAuthHeaders = () => {
 };
 
 export const adminProductService = {
-  getAll: async (params?: { name?: string; categoryId?: string }) => {
+  getAll: async (params?: { name?: string; categoryId?: string; page?: number }) => {
     const response = await axios.get(`${API_URL}/products`, { params });
     return response.data;
   },

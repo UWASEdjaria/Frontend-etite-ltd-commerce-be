@@ -19,7 +19,7 @@ export const ProductForm = ({
   const [categories, setCategories] = useState<Category[]>([]);
   const [useUrlInput, setUseUrlInput] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState<string>('');
 
   const {
     register,
@@ -28,13 +28,13 @@ export const ProductForm = ({
     formState: { errors, isSubmitting },
   } = useForm<FormInputs>({
     resolver: zodResolver(createProductSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      price: 0,
-      stock: 0,
-      categoryId: '',
-      condition: 'NEW',
+   values: {
+      name: product?.name || '',
+      description: product?.description || '',
+      price: product?.price ?? 0,
+      stock: product?.stock ?? 0,
+      categoryId: product?.categoryId || '',
+      condition: product?.condition || 'NEW',
     },
   });
 
@@ -45,15 +45,20 @@ export const ProductForm = ({
   useEffect(() => {
     if (product) {
       reset({
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        stock: product.stock,
-        categoryId: product.categoryId,
-        condition: product.condition,
+        name: product.name || '',
+        description: product.description || '',
+        price: product.price ?? 0,
+        stock: product.stock ?? 0,
+        categoryId: product.categoryId || '',
+        condition: product.condition || 'NEW',
       });
       setImageUrl(product.imageUrl || '');
       setUseUrlInput(!!product.imageUrl);
+    } else {
+      // Optional: reset to empty if no product (creating new)
+      reset({ name: '', description: '', price: 0, stock: 0, categoryId: '', condition: 'NEW' });
+      setImageUrl('');
+      setUseUrlInput(false);
     }
   }, [product, reset]);
 
@@ -69,7 +74,10 @@ export const ProductForm = ({
     formData.append('stock', String(data.stock));
     formData.append('categoryId', data.categoryId);
     formData.append('condition', data.condition || 'NEW');
-    formData.append('imageUrl', imageUrl || '');
+   
+    if (imageUrl) {
+    formData.append('imageUrl', imageUrl);
+  }
 
     try {
       if (isEdit && product) {
@@ -90,24 +98,39 @@ export const ProductForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">zz
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <div>
         <button type="button" onClick={() => setUseUrlInput(!useUrlInput)} className="text-xs text-orange-600 underline">
           {useUrlInput ? 'Use file upload' : 'Use image URL'}
         </button>
-        {!useUrlInput ? (
-          <input type="file" accept="image/*" className={inputClass} onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
+       {!useUrlInput ? (
+          <input 
+            key="image-file-input"
+            type="file" 
+            accept="image/*" 
+            className={inputClass} 
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)} 
+          />
         ) : (
-          <input className={inputClass} placeholder="Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+          <input 
+            key="image-url-input"
+            className={inputClass} 
+            placeholder="Image URL" 
+            value={imageUrl || ''} 
+            onChange={(e) => setImageUrl(e.target.value)} 
+          />
         )}
       </div>
 
-      <input {...register('name')} placeholder="Product name" className={inputClass} />
+      <input {...register('name')} defaultValue="" placeholder="Product name" className={inputClass} />
       {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
 
-      <input type="number" {...register('price', { valueAsNumber: true })} placeholder="Price" className={inputClass} />
-      <input type="number" {...register('stock', { valueAsNumber: true })} placeholder="Stock" className={inputClass} />
-      <textarea {...register('description')} placeholder="Description" className={inputClass} />
+      <input type="number" {...register('price', { valueAsNumber: true ,
+      setValueAs: (v) => (v === '' ? 0 : Number(v)),})} placeholder="Price" className={inputClass} />
+
+      <input type="number" {...register('stock', { valueAsNumber: true ,
+    setValueAs: (v) => (v === '' ? 0 : Number(v)),})} placeholder="Stock" className={inputClass} />
+      <textarea {...register('description')} defaultValue="" placeholder="Description" className={inputClass} />
 
       <select {...register('categoryId')} className={inputClass}>
         <option value="">Select category</option>

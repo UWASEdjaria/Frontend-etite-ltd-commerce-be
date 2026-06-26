@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { LoginCredentials, RegisterData, VerifyOtpPayload,  ResendOtpPayload, SetPasswordPayload, UserProfileResponse} from '@/types/auth';
-import { InviteFormData, UserRow } from '@/types/admin';
+import { InviteFormData, PaginatedUsersResponse, UserRow } from '@/types/admin';
 
 class AuthService {
   private api: AxiosInstance;
@@ -53,8 +53,9 @@ class AuthService {
   }
 
   // --- ADMINISTRATIVE SERVICES ---
-  async getAllUsers(): Promise<UserRow[]> {
-  const { data } = await this.api.get<UserRow[]>('/admin/users', {
+  async getAllUsers(page: number = 1, limit: number = 10): Promise<PaginatedUsersResponse> {
+  const { data } = await this.api.get<PaginatedUsersResponse>('/admin/users', {
+    params: { page, limit }
   });
   return data;
 }
@@ -64,7 +65,7 @@ async inviteUser(userData: InviteFormData): Promise<UserRow> {
   return data;
 }
 async updateUser(id: string, updateFields: Partial<UserRow>): Promise<UserRow> {
-  const { data } = await this.api.patch<UserRow>(`/admin/users/${id}`, updateFields);
+  const { data } = await this.api.put<UserRow>(`/admin/users/${id}`, updateFields);
   return data;
 }
 

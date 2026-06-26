@@ -4,6 +4,7 @@ export interface UserRow {
   email: string;
   role: 'USER' | 'ADMIN';
   isVerified: boolean;
+  status: 'REGISTERED' | 'ACTIVE';
 }
 
 export interface InviteFormData {
@@ -40,4 +41,10 @@ export interface AdminStatsBarProps {
   admins: number;
   feedback: FeedbackStatus;
   onUserCreated: (user: InviteFormData) => Promise<void>;
+}
+export interface PaginatedUsersResponse {
+  users: UserRow[];
+  totalPages: number;
+  currentPage: number;
+  totalUsers: number;
 }

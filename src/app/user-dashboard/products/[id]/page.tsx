@@ -4,6 +4,8 @@ import { UserProduct } from "@/types/userProduct";
 import { resolveProductImage } from "@/lib/resolveProductImage";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { cartService } from "@/services/cartService";
+import toast from "react-hot-toast";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -16,7 +18,15 @@ export default function ProductDetailPage() {
   if (!product) return <div className="p-10">Loading...</div>;
 
   const imageUrl = resolveProductImage(product);
-
+ 
+  const addToCart = async () => {
+  try {
+    await cartService.addToCart(product.id, 1); // Assuming 1 is the quantity
+    toast.success("Added to cart!");
+  } catch (error) {
+    toast.error("Failed to add to cart");
+  }
+};
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-3">
       <img src={imageUrl} alt={product.name} className="w-full h-48 object-cover rounded-xl" />
