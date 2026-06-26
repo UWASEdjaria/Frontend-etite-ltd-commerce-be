@@ -4,6 +4,7 @@ export interface UserRow {
   email: string;
   role: 'USER' | 'ADMIN';
   isVerified: boolean;
+  status: 'REGISTERED' | 'ACTIVE';
 }
 
 export interface InviteFormData {

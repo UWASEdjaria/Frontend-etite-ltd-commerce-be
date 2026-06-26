@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FiHome, FiShoppingBag, FiHeart, FiPackage, FiSettings, FiX, FiUser } from 'react-icons/fi';
+import { FiHome, FiShoppingBag, FiHeart, FiPackage, FiSettings, FiX, FiUser, FiShoppingCart } from 'react-icons/fi';
 
 import { DashboardSidebarProps } from '@/types/dashboard';
 import { usePathname } from 'next/navigation';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 const navItems = [
   { icon: FiHome, label: 'user-dashboard', href: '/user-dashboard' },
   { icon: FiShoppingBag, label: 'Products', href: '/user-dashboard/products' },
-  { icon: FiShoppingBag, label: 'Shop', href: '/shop'},
+  { icon: FiShoppingCart, label: 'Cart', href: '/user-dashboard/cart' },
   { icon: FiPackage, label: 'My Orders', href: '/user-dashboard/orders' },
   { icon: FiHeart, label: 'Wishlist', href: '/user-dashboard/wishlist'},
   { icon: FiUser, label: 'Profile', href: '/user-dashboard/profile' },

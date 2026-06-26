@@ -1,10 +1,26 @@
 'use client';
+import { useState } from 'react';
 import { UserProduct } from "@/types/userProduct";
 import { resolveProductImage } from "@/lib/resolveProductImage";
 import Link from "next/link";
+import { cartService } from "@/services/cartService";
 
 export default function ProductCard({ product }: { product: UserProduct }) {
+  const [isAdding, setIsAdding] = useState(false);
   const imageUrl = resolveProductImage(product);
+
+  const handleAddToCart = async () => {
+    setIsAdding(true);
+    try {
+      await cartService.addToCart({ productId: product.id, quantity: 1 });
+      alert('Product added to cart!');
+      } catch (error) {
+      console.error('Failed to add to cart:', error);
+      alert('Failed to add to cart');
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   return (
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition flex flex-col">
@@ -28,6 +44,13 @@ export default function ProductCard({ product }: { product: UserProduct }) {
           >
             View Details
           </Link>
+          <button
+              onClick={handleAddToCart}
+              disabled={isAdding}
+              className="text-xs font-bold bg-orange-700 text-white px-3 py-1.5 rounded-lg hover:bg-orange-800 transition shrink-0 disabled:opacity-50"
+            >
+              {isAdding ? 'Adding...' : 'Add to Cart'}
+            </button>
         </div>
       </div>
     </div>
