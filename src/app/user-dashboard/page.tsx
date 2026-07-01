@@ -60,21 +60,11 @@ export default function DashboardPage() {
   if (isAuthenticated === null || !isAuthenticated) return null;
 
   return (
-    <>
-      <div className="p-4 mb-10 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        <h2 className="text-xl font-extrabold text-slate-900">Good to see you again 👋❤️</h2>
-        <p className="text-sm text-slate-500 mt-1">Here&apos;s an overview of your account activity.</p>
-      </div>
-
-      {/* FIXED: Added optional chaining to stats.map */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats?.map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className={`rounded-xl p-4 ${color} flex items-center gap-3`}>
-            <Icon size={20} />
-            <div>
-              <p className="text-2xl font-extrabold leading-none">{value}</p>
-              <p className="text-xs font-semibold mt-1 opacity-80">{label}</p>
-            </div>
+       <>
+          {/* Welcome */}
+          <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+            <h2 className="text-xl font-extrabold text-slate-900">Welcome back 👋</h2>
+            <p className="text-sm text-slate-500 mt-1">Here&apos;s an overview of your account activity.</p>
           </div>
         ))}
       </div>

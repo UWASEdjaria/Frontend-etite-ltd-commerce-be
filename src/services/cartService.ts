@@ -10,7 +10,7 @@ const api = axios.create({
 const getToken = () => localStorage.getItem("token");
 
 export const cartService = {
-  getCart: (page: number = 1) => api.get(`/cart?page=${page}`, {
+  getCart: () => api.get('/cart', {
     headers: { Authorization: `Bearer ${getToken()}` }
   }).then(res => res.data),
   

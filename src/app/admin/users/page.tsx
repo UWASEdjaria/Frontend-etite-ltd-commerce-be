@@ -21,28 +21,15 @@ export default function AdminUsersPage() {
   const [filters, setFilters] = useState<UserFilters>(defaultFilters);
   const [isLoading, setIsLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
- 
-  const fetchUsers = async (page: number) => {
-    try {
-    const response = await authService.getAllUsers(page, 10);
-    console.log("API Response:", response);
-    setUsers(response.users);
-    setTotalPages(response.totalPages);
-    setCurrentPage(response.currentPage);
-  } catch (err) {
-    setFeedback({
-      message: (err as AdminAxiosError).response?.data?.message || 'Failed to load users.',
-      isError: true
-    });
-  }
-};
 
-useEffect(() => {
-  fetchUsers(1);
-}, []);
+  useEffect(() => {
+    authService.getAllUsers()
+      .then((data) => setUsers(Array.isArray(data) ? data : []))
+      .catch((err: AdminAxiosError) => setFeedback({
+        message: err.response?.data?.message || 'Forbidden: Admin must be active.',
+        isError: true
+      }));
+  }, []);
 
   const handleUserCreated = async (data: InviteFormData) => {
     setFeedback({ message: '', isError: false });

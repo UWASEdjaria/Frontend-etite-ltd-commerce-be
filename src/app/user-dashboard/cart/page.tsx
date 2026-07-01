@@ -1,81 +1,46 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cartService } from '@/services/cartService';
 import { FiTrash2, FiMinus, FiPlus } from 'react-icons/fi';
 import { CartItem } from '@/types/cart';
 import { toast, Toaster } from 'react-hot-toast';
 import { AxiosError } from 'axios';
-import { createOrderSchema } from '@/lib/validations/orderValidation';
-import { useRouter } from 'next/navigation';
-import { orderService } from '@/services/orderService';
-import Pagination from '@/components/ui/pagnition';
 
 export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   // State to track which item is currently asking for deletion confirmation
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const router = useRouter();
-  
-  const handleCheckout = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const shippingAddress = formData.get("address") as string;
 
+  const fetchCart = async () => {
     try {
-      createOrderSchema.parse({ shippingAddress });
-      setIsCheckingOut(true);
-      
-      await orderService.createOrder({ shippingAddress });
-      
-      toast.success("Order placed successfully!");
-      router.push('/user-dashboard/orders');
-    } catch (err) {
-      toast.error("Checkout failed. Please try again.");
-    } finally {
-      setIsCheckingOut(false);
-    }
-  };
-
-  const fetchCart =useCallback(async (page: number) => {
-    try {
-      const response = await cartService.getCart(page);
-      console.log("API Response:", response);
-      setItems(response.items || []);
-      setTotalPages(response.totalPages || 1);
-      setCurrentPage(page);
+      const data = await cartService.getCart();
+      setItems(data);
     } catch (error) {
       console.error("Failed to fetch cart:", error);
     }
-   } , []);
+  };
 
   useEffect(() => {
-    fetchCart(1);
-  }, [fetchCart]);
+    fetchCart();
+  }, []);
 
   const updateQuantity = async (id: string, quantity: number) => {
     if (quantity < 1) return;
     try {
       await cartService.updateItem(id, quantity);
-      fetchCart(currentPage);
+      fetchCart();
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
       const message = err.response?.data?.message || "Could not update quantity";
       toast.error(message);
     }
   };
- 
+
   const removeItem = async (id: string) => {
     try {
       await cartService.removeItem(id);
-      if (items.length === 1 && currentPage > 1) {
-      fetchCart(currentPage - 1);
-      } else {
-      fetchCart(currentPage);
-    }
+      fetchCart();
       toast.success("Item removed");
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
@@ -87,12 +52,11 @@ export default function CartPage() {
   };
 
   return (
-   <div className="w-full px-4 sm:px-6 lg:px-8 py-6 pb-20 max-w-5xl mx-auto min-h-screen overflow-y-auto">
-   
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 max-w-5xl mx-auto">
       <Toaster position="top-right" />
       <h1 className="text-xl sm:text-2xl font-bold mb-6 text-slate-800">Shopping Cart</h1>
       
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         {items.length === 0 ? (
           <p className="p-10 text-center text-slate-500">Your cart is empty.</p>
         ) : (
@@ -146,51 +110,14 @@ export default function CartPage() {
                       aria-label="Remove item"
                     >
                       <FiTrash2 size={18} />
-                       </button>
-                        )}
-                      </div>
-                    </div>
-                    ))}
-                  </div>
-                   )}
-                  </div>
-                  <div className="mt-8 p-6 bg-white rounded-xl shadow-sm border border-slate-200">
-                      <div className="flex justify-between font-bold text-lg mb-1">
-                  <span  className="text-slate-500">Total</span>
-                 <span className="text-slate-500">{items.reduce((acc, i) => acc + (i.product.price * i.quantity), 0).toLocaleString()} RWF</span>
-                  </div>
-                  {items.length > 0 && (
-                        <form onSubmit={handleCheckout} className="mt-8 mb-4 bg-slate-50 p-6 rounded-xl border border-slate-200">
-                        <h2 className="text-lg font-bold mb-4 text-slate-800">Complete Order</h2>
-                         <div className="flex flex-col gap-3">
-                          <input 
-                             name="address" 
-                             required 
-                             placeholder="Enter shipping address" 
-                             className="w-full p-2 border border-slate-300 rounded-lg text-slate-900"
-                            />
-                        <button 
-                              type="submit" 
-                              disabled={isCheckingOut}
-                              className="w-full bg-orange-600 text-white py-2 rounded-lg font-bold hover:bg-orange-700 disabled:bg-slate-400"
-                              >
-                             {isCheckingOut ? "Processing..." : "Place Order"}
-                        </button>
-                     </div>
-                 </form>
-               )}      
-           </div>
-            <div className="mt-6 pb-32 mb-10 flex justify-center pb-10">
-
-           {totalPages > 1 && (
-          <Pagination 
-            currentPage={currentPage} 
-            totalPages={totalPages} 
-            onPageChange={(page) => fetchCart(page)} 
-          />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
-        </div>
-           </div>
-           
-         );
-     }
+      </div>
+    </div>
+  );
+}

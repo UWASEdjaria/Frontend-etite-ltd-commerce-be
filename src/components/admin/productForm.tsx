@@ -112,13 +112,7 @@ export const ProductForm = ({
             onChange={(e) => setImageFile(e.target.files?.[0] || null)} 
           />
         ) : (
-          <input 
-            key="image-url-input"
-            className={inputClass} 
-            placeholder="Image URL" 
-            value={imageUrl || ''} 
-            onChange={(e) => setImageUrl(e.target.value)} 
-          />
+          <input className={inputClass} placeholder="Image URL" value={imageUrl || ''} onChange={(e) => setImageUrl(e.target.value)} />
         )}
       </div>
 
