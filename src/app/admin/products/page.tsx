@@ -1,42 +1,39 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback} from 'react';
 import { FiX, FiSearch } from 'react-icons/fi';
 import AdminProductTable from '@/components/admin/AdminProductTable';
 import ProductModal from '@/components/admin/ProductModal';
 import { adminProductService } from '@/services/adminProduct.service';
 import { AdminProduct } from '@/types/adminProduct';
+import Pagination from '@/components/ui/pagnition';
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<AdminProduct[]>([]);
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [categories] = useState<{ id: string; name: string }[]>([]);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<AdminProduct | null>(null);
   const [editProduct, setEditProduct] = useState<AdminProduct | null>(null);
 
-  const fetchProducts = async () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchProducts =useCallback(async (page: number = 1) => {
     try {
-      const data = await adminProductService.getAll();
-      setProducts(data);
+      const response = await adminProductService.getAll({ page, name: search, categoryId: categoryFilter });
+        setProducts(response.data);
+        setTotalPages(response.totalPages);
     } catch (error) {
       console.error("Failed to fetch products", error);
     }
-  };
+  }, [search, categoryFilter]);
 
-  useEffect(() => {
-    fetchProducts();
-    adminProductService.getCategories().then(setCategories).catch(() => {});
-  }, []);
+useEffect(() => {
+  fetchProducts(currentPage);
+}, [currentPage,fetchProducts]);  
 
-  const filtered = useMemo(() => {
-    return products.filter((p) => {
-      const matchName = p.name.toLowerCase().includes(search.toLowerCase());
-      const matchCategory = categoryFilter ? p.categoryId === categoryFilter : true;
-      return matchName && matchCategory;
-    });
-  }, [products, search, categoryFilter]);
 
   const handleEdit = (product: AdminProduct) => {
     setEditProduct(product);
@@ -71,13 +68,18 @@ export default function AdminProductsPage() {
             type="text"
             placeholder="Search by name..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {setSearch(e.target.value)
+              setCurrentPage(1)
+            }}
             className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
         </div>
         <select
+          aria-label="Filter products by category"
           value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
+          onChange={(e) => {setCategoryFilter(e.target.value)
+            setCurrentPage(1);
+          }}
           className="border border-slate-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-400"
         >
           <option value="">All Categories</option>
@@ -88,10 +90,13 @@ export default function AdminProductsPage() {
       </div>
 
       <AdminProductTable 
-        products={filtered} 
+        products={products} 
         onDelete={fetchProducts} 
         onViewDetails={setSelectedProduct}
         onEdit={handleEdit}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
       />
       
       <ProductModal 
@@ -135,6 +140,19 @@ export default function AdminProductsPage() {
           </div>
         </div>
       )}
+      <div className="mt-6 pb-32 mb-10 flex justify-center pb-10">
+  {totalPages > 1 ? (
+    <Pagination 
+      currentPage={currentPage} 
+      totalPages={totalPages} 
+      onPageChange={(page) => setCurrentPage(page)} 
+    />
+  ) : (
+    <p className="text-xs text-slate-400">
+      Showing all {products.length} products (Page {currentPage} of {totalPages})
+    </p>
+  )}
+</div>
     </div>
   );
 }

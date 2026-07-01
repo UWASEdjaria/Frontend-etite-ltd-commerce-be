@@ -7,6 +7,7 @@ import { UserRow, InviteFormData, AdminAxiosError, FeedbackStatus } from '@/type
 import { FiEdit2, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
 import UserFilterBar from '@/components/admin/UserFilterBar';
 import { UserFilters, defaultFilters, filterUsers } from '@/lib/userFilters';
+import Pagination from '@/components/ui/pagnition';
 
 function getInitials(name: string) {
   return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
@@ -197,6 +198,13 @@ export default function AdminUsersPage() {
             </tbody>
           </table>
         </div>
+        <div className="mt-6 pb-32 mb-10 flex justify-center pb-10">
+           <Pagination 
+              currentPage={currentPage} 
+              totalPages={totalPages} 
+              onPageChange={(page) => fetchUsers(page)} 
+              />
+          </div>
       </div>
   );
 }

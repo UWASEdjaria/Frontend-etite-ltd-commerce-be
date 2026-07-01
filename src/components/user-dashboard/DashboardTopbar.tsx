@@ -1,11 +1,21 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter ,usePathname } from 'next/navigation';
 import { FiLogOut } from 'react-icons/fi';
 import { DashboardTopbarProps } from '@/types/dashboard';
 
 export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
   const router = useRouter();
+  const pathname = usePathname();
+ const getPageTitle = () => {
+  if (pathname.includes('/orders')) return 'My Orders';
+  if (pathname.includes('/wishlist')) return 'My Wishlist';
+  if (pathname.includes('/cart')) return 'My Cart';
+  if (pathname.includes('/profile')) return 'Profile Settings';
+  if (pathname.includes('/settings')) return 'Account Settings';
+  if (pathname.includes('/products')) return 'Products';
+  return 'Dashboard'; // Default title
+};
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -20,7 +30,7 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <h1 className="text-base font-bold text-slate-800">Dashboard</h1>
+        <h1 className="text-base font-bold text-slate-800">{getPageTitle()}</h1>
       </div>
 
       <div className="flex items-center gap-3">

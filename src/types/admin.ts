@@ -42,3 +42,9 @@ export interface AdminStatsBarProps {
   feedback: FeedbackStatus;
   onUserCreated: (user: InviteFormData) => Promise<void>;
 }
+export interface PaginatedUsersResponse {
+  users: UserRow[];
+  totalPages: number;
+  currentPage: number;
+  totalUsers: number;
+}

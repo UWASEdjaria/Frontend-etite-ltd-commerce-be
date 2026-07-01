@@ -1,51 +1,52 @@
 'use client';
 import ProductCard from "@/components/product/productCard";
-import { userProductService } from "@/services/userProduct.service";
 import { adminProductService } from "@/services/adminProduct.service";
 import { UserProduct } from "@/types/userProduct";
-import { useEffect, useState, useMemo, useRef } from "react";
 import { FiSearch } from "react-icons/fi";
+import { useEffect, useState, useCallback } from "react";
+import Pagination from "@/components/ui/pagnition";
 
 export default function UserProductsPage() {
   const [products, setProducts] = useState<UserProduct[]>([]);
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  
+  //Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+ // 1. Fetch categories ONCE when the page loads
+ 
+  // 2. Fetch products whenever search or category changes
+  
+    const fetchProducts = useCallback(async (page: number) => {
+      try {
+        const response = await adminProductService.getAll({ 
+          name: searchTerm, 
+          categoryId: categoryId,
+          page: page 
+        });
+        setProducts(response.data || []);
+        setTotalPages(response.totalPages || 1);
+      } catch (err) {
+        console.error('FETCH ERROR:', err);
+        setProducts([]);
+      }
+  }, [searchTerm, categoryId]);
 
-  const fetched = useRef(false);
-
-  useEffect(() => {
-    if (fetched.current) return;
-    fetched.current = true;
-
-    userProductService.getAll()
-      .then((data) => {
-        const raw = Array.isArray(data) ? data
-          : Array.isArray((data as { data?: UserProduct[] }).data) ? (data as { data: UserProduct[] }).data
-          : [];
-        // Deduplicate by name (backend has duplicate entries with different ids)
-        const unique = Array.from(new Map(raw.map((p) => [p.name.trim().toLowerCase(), p])).values());
-        setProducts(unique);
-      })
-      .catch((err) => console.error('FETCH ERROR:', err));
+  // Initial load for categories
+   useEffect(() => {
     adminProductService.getCategories()
-      .then((data) => {
-        const unique = Array.from(new Map(data.map((c: { id: string; name: string }) => [c.id, c])).values());
-        setCategories(unique);
-      })
-      .catch(() => {});
+      .then((data) => setCategories(data))
+      .catch((err) => console.error("Category fetch error:", err));
   }, []);
-
-  const filtered = useMemo(() => {
-    return products.filter((p) => {
-      const matchName = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchCategory = categoryId ? p.categoryId === categoryId : true;
-      return matchName && matchCategory;
-    });
-  }, [products, searchTerm, categoryId]);
+  // Fetch products when filters change (Reset to page 1)
+  useEffect(() => {
+    fetchProducts(currentPage);
+  }, [currentPage, fetchProducts]);
 
   return (
-    <div className="p-4 sm:p-6 pb-10">
+    <div className="p-4 sm:p-6 pb-40 mb-10">
       {/* Search & Filter */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1 max-w-sm">
@@ -59,6 +60,7 @@ export default function UserProductsPage() {
           />
         </div>
         <select
+          aria-label="Select product category"
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
           className="border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-600 bg-white"
@@ -69,14 +71,26 @@ export default function UserProductsPage() {
           ))}
         </select>
       </div>
-
-      {filtered.length === 0 ? (
-        <p className="text-center text-slate-400 py-16">No products found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8">
-          {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
-        </div>
-      )}
+ <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8">
+        {products.length > 0 ? (
+          products.map((p) => <ProductCard key={p.id} product={p} />)
+        ) : (
+          <p className="col-span-full text-center text-slate-400 py-16">No products found.</p>
+        )}
+      </div>
+       <div className="mt-6 pb-32 mb-10 flex justify-center pb-10">
+        {totalPages > 1 ? (
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={(page) => setCurrentPage(page)} 
+          />
+        ) : (
+          <p className="text-sm text-slate-400">
+            Showing all {products.length} products (Page {currentPage} of {totalPages})
+          </p>
+        )}
+      </div>
     </div>
   );
 }
