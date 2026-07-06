@@ -13,7 +13,7 @@ export default function Logo({ variant = 'dark', href = '/', subtitle }: LogoPro
 
   const content = (
     <div className="flex items-center gap-2">
-      <div className="w-8 h-8 bg-orange-700 rounded-lg flex items-center justify-center shrink-0">
+      <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center shrink-0">
         <FiTool size={16} className="text-white" />
       </div>
       <div>

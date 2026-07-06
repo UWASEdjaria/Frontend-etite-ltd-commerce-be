@@ -48,3 +48,13 @@ export interface PaginatedUsersResponse {
   currentPage: number;
   totalUsers: number;
 }
+export interface LowStockItem {
+  id: string;
+  name: string;
+  stock: number;
+}
+interface AdminTopbarExtendedProps extends AdminTopbarProps {
+  title: string;
+  unreadCount: number;
+  lowStockItems: LowStockItem[]; // Use the interface
+}

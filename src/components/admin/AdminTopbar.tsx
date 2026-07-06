@@ -1,35 +1,46 @@
 'use client';
 
 import { AdminTopbarProps } from '@/types/admin';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import  Link  from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
 import { FiLogOut } from 'react-icons/fi';
+import Logo from '../ui/Logo';
 
-export default function AdminTopbar({ onMenuClick, title}: AdminTopbarProps& { title: string }) {
-  const router = useRouter();
+ 
+export default function AdminTopbar({ onMenuClick}: AdminTopbarProps& { title: string }) {
+   const {initials, logout} = useAuth();
+  const [mounted, setMounted] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    router.replace('/login');
-  };
-  return (
-    <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-3.5 flex items-center justify-between shrink-0">
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+return (
+    <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-3.5 flex items-center justify-between shrink-0 z-50 relative">
       <div className="flex items-center gap-3">
-        <button className="md:hidden text-slate-500 hover:text-slate-800" onClick={onMenuClick} aria-label="Open menu">
+        <button className="md:hidden text-slate-500 hover:text-slate-800" onClick={onMenuClick} aria-label="Toggle menu">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <h1 className="text-base font-bold text-slate-800">{title}</h1>
+       <Logo/>
       </div>
-      <span className="px-3 py-1 bg-orange-50 text-orange-700 font-bold text-xs rounded-full border border-orange-200">Super Admin</span>
-      <button
-          onClick={handleLogout}
-          title="Logout"
-          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-red-600 font-semibold transition"
-        >
-          <FiLogOut size={15} />
-          <span className="hidden sm:inline">Logout</span>
-        </button>
+         <div className="flex items-center gap-4">
+         {mounted && (
+              <Link
+               href="/user-dashboard/profile" className="w-10 h-10 md:w-8 md:h-8 rounded-full border-2 border-orange-500 text-orange-500 flex items-center justify-center font-bold">
+               {initials}
+              </Link>
+      
+              )}
+            <button
+               onClick={logout}
+               className="flex items-center text-sm gap-2 text-gray-600 hover:text-red-600">
+             <FiLogOut/>
+             Logout
+            </button>
+           </div>
     </header>
   );
 }

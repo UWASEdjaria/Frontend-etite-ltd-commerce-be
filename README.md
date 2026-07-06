@@ -1,167 +1,105 @@
-# ETITE LTD Commerce Frontend
+﻿# ETITE LTD Commerce Frontend
 
-A modern, responsive e-commerce authentication frontend built with Next.js, TypeScript, and Tailwind CSS.
+A Next.js + TypeScript e-commerce frontend for admin and user dashboards.
 
-## 🚀 Features
+## What this project includes
 
-- **User Authentication**
-  - Sign Up / Register
-  - Sign In / Login
-  - Email OTP Verification
-  - Resend OTP functionality
-  - Password visibility toggle
+- Admin product management
+- Admin order and analytics pages
+- User product browsing, cart, checkout, orders, wishlist, and profile
+- Authentication flow with login, sign up, OTP verify, and password reset
+- File uploads for product images using `FormData`
+- Mobile money checkout via Flutterwave
+- Toast notification messages for success / error feedback
 
-- **Security**
-  - OTP-based email verification
-  - Secure authentication service
-  - Error handling with user-friendly messages
+## Main technologies
 
-- **UI/UX**
-  - Modern, clean interface
-  - Responsive design (mobile-first)
-  - Beautiful background images
-  - Form validation
-  - Loading states
-  - Error displays
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- Axios for API calls
+- react-hook-form + zod for validation
+- react-hot-toast and sonner for notifications
+- react-icons / lucide-react for icons
 
-## 📁 Project Structure
+## Key folders
 
+- `src/app/` - page routes and layouts
+- `src/components/` - reusable UI components and admin widgets
+- `src/services/` - API service functions
+- `src/types/` - TypeScript type definitions
+- `src/lib/` - validation and helper utilities
+
+## Important pages
+
+- `/admin/products` - admin product list + add/edit product
+- `/admin/orders` - admin order management
+- `/admin/analytics` - admin dashboard summary
+- `/admin/users` - admin user management
+- `/user-dashboard/products` - browse products
+- `/user-dashboard/cart` - cart page
+- `/user-dashboard/checkout` - checkout page
+- `/user-dashboard/orders` - user order history
+- `/user-dashboard/profile` - user profile page
+- `/user-dashboard/wishlist` - wishlist page
+
+## Upload flow
+
+Product image upload happens in:
+- `src/components/admin/productForm.tsx`
+
+The form creates a `FormData` object, appends the image file and other product fields, and sends it to the backend through:
+- `src/services/adminProduct.service.ts`
+
+The backend endpoint is:
+- `POST ${API_URL}/products`
+- `PUT ${API_URL}/products/{id}`
+
+## Why pages update without refresh
+
+This is a React Single Page App behavior:
+
+- Components use `useState()` to store page data
+- Pages use `useEffect()` to fetch data from the backend
+- When data changes, React re-renders the page automatically
+- No full browser refresh is required
+
+## Setup
+
+1. Install dependencies
+
+```bash
+pnpm install
 ```
-src/
-├── app/                    # Next.js app directory
-│   ├── login/             # Login page
-│   ├── signup/            # Registration page
-│   ├── verify/            # OTP verification page
-│   │   └── resend/        # Resend OTP page
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Home page
-├── components/
-│   └── auth/              # Auth components
-│       ├── AuthInput.tsx  # Reusable input (with password toggle)
-│       ├── AuthButton.tsx # Reusable button
-│       ├── navbar.tsx
-│       ├── footer.tsx
-├── services/
-│   └── authService.ts     # API service for auth endpoints
-└── types/
-    └── auth.ts            # TypeScript interfaces
-```
 
-## 🛠️ Installation & Setup
-
-### Prerequisites
-- Node.js 18+ 
-- pnpm (recommended) or npm
-
-### Steps
-
-1. **Install dependencies**
-   ```bash
-   pnpm install
-   ```
-
-2. **Set up environment variables**
-   Create a `.env.local` file:
-   ```
-   NEXT_PUBLIC_API_URL=http://localhost:5000
-   ```
-
-3. **Run development server**
-   ```bash
-   pnpm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000)
-
-4. **Build for production**
-   ```bash
-   pnpm run build
-   pnpm run start
-   ```
-
-## 📋 Authentication Flow
-
-1. **Sign Up** → User registers with name, email, password
-2. **Verification Email** → Backend sends OTP to email
-3. **Verify OTP** → User enters 6-digit code
-4. **Success** → Token stored, redirect to dashboard
-5. **Resend OTP** → If expired, user can request new code
-
-## 🔐 API Endpoints Required
-
-Your backend should provide:
-- `POST /auth/signup` - Register new user
-- `POST /auth/login` - User login
-- `POST /auth/verify-otp` - Verify OTP code
-- `POST /auth/resend-otp` - Resend OTP
-
-## 🎨 UI Components
-
-### AuthInput
-- Text input with labels
-- **Password fields** have show/hide toggle (👁️ icon)
-- Responsive design
-- Validation support
-
-### AuthButton
-- Loading state with spinner
-- Disabled state styling
-- Hover effects
-
-## 📱 Pages
-
-| Route | Purpose |
-|-------|---------|
-| `/login` | User login |
-| `/signup` | User registration |
-| `/verify` | OTP verification |
-| `/verify/resend` | Resend OTP code |
-
-## ⚠️ Recent Fixes
-
-✅ Fixed OTP verification flow
-✅ Added resend OTP functionality
-✅ Implemented password show/hide toggle
-✅ Improved error handling and messages
-✅ Removed duplicate component declarations
-
-## 🔧 Tech Stack
-
-- **Framework**: Next.js 16.2.9 (with Turbopack)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **HTTP Client**: Axios
-- **State Management**: React Hooks (useState)
-
-## 📝 Environment Variables
+2. Create `.env.local`
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_FLW_PUBLIC_KEY=your_flutterwave_key
 ```
 
-## 🤝 Contributing
+3. Start development server
 
-1. Create a new branch
-2. Make your changes
-3. Test thoroughly
-4. Submit a pull request
+```bash
+pnpm dev
+```
 
-## 📧 Support
+4. Build for production
 
-For issues or questions, contact the development team.
+```bash
+pnpm build
+pnpm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Notes
 
-## Learn More
+- This is a frontend repo only; it depends on a backend API at `NEXT_PUBLIC_API_URL`
+- Authentication tokens are stored in `localStorage`
+- Product uploads are sent as multipart form data
+- Notifications use `react-hot-toast` and `sonner`
 
-To learn more about Next.js, take a look at the following resources:
+## Useful prompt for learning this project
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> Explain this Next.js + TypeScript ecommerce frontend project: what each main page does, how API calls are made from `src/services`, how product image uploads work with `FormData`, and how React state makes pages refresh without full browser reload.

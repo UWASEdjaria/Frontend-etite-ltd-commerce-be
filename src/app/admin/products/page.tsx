@@ -5,6 +5,7 @@ import { FiX, FiSearch } from 'react-icons/fi';
 import AdminProductTable from '@/components/admin/AdminProductTable';
 import ProductModal from '@/components/admin/ProductModal';
 import { adminProductService } from '@/services/adminProduct.service';
+import { adminStockService } from '@/services/adminStockService';
 import { AdminProduct } from '@/types/adminProduct';
 import Pagination from '@/components/ui/pagnition';
 
@@ -19,12 +20,23 @@ export default function AdminProductsPage() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [stockMap, setStockMap] = useState<Record<string, number>>({});
 
-  const fetchProducts =useCallback(async (page: number = 1) => {
+  const fetchProducts = useCallback(async (page: number = 1) => {
     try {
-      const response = await adminProductService.getAll({ page, name: search, categoryId: categoryFilter });
-        setProducts(response.data);
-        setTotalPages(response.totalPages);
+      const [productRes, stockRes] = await Promise.all([
+        adminProductService.getAll({ page, name: search, categoryId: categoryFilter }),
+        adminStockService.getAll(),
+      ]);
+      setProducts(productRes.data);
+      setTotalPages(productRes.totalPages);
+      const map: Record<string, number> = {};
+      const stockList = Array.isArray(stockRes) ? stockRes : stockRes?.data ?? [];
+      
+      for (const s of stockList) {
+        map[s.productId] = (map[s.productId] ?? 0) + s.quantity;
+      }
+      setStockMap(map);
     } catch (error) {
       console.error("Failed to fetch products", error);
     }
@@ -49,12 +61,12 @@ useEffect(() => {
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Products</h1>
-          <p className="text-sm text-gray-500">Manage your inventory and product listings.</p>
+         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Product Management</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Manage your inventory, pricing, and product listings.</p>
         </div>
         <button 
           onClick={() => { setEditProduct(null); setIsModalOpen(true); }}
-          className="bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-orange-800 transition"
+          className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-orange-600 transition"
         >
           + Add New Product
         </button>
@@ -91,6 +103,7 @@ useEffect(() => {
 
       <AdminProductTable 
         products={products} 
+        stockMap={stockMap}
         onDelete={fetchProducts} 
         onViewDetails={setSelectedProduct}
         onEdit={handleEdit}
@@ -115,9 +128,9 @@ useEffect(() => {
               aria-label="Close product details"
               className="absolute top-4 right-4 p-2 rounded-full hover:bg-orange-50 transition"
             >
-              <FiX size={20} className="text-orange-700" />
+              <FiX size={20} className="text-orange-500" />
             </button>
-            <h2 className="text-xl font-bold mb-4 text-orange-900">Product Details</h2>
+            <h2 className="text-xl font-bold mb-4 text-orange-500">Product Details</h2>
             {selectedProduct.imageUrl && (
               <img 
                 src={selectedProduct.imageUrl} 
@@ -130,11 +143,11 @@ useEffect(() => {
             <div className="mt-6 grid grid-cols-2 gap-4 border-t border-orange-100 pt-4">
               <div>
                 <p className="text-xs text-orange-600 font-semibold uppercase">Price</p>
-                <p className="font-bold text-lg text-slate-900">{selectedProduct.price.toLocaleString()} RWF</p>
+                <p className="font-bold text-lg text-slate-900">{stockMap[selectedProduct.id] ?? selectedProduct.stock ?? 0} RWF</p>
               </div>
               <div>
                 <p className="text-xs text-orange-600 font-semibold uppercase">Stock</p>
-                <p className="font-bold text-lg text-slate-900">{selectedProduct.stock}</p>
+                <p className="font-bold text-lg text-slate-900">{stockMap[selectedProduct.id] ?? selectedProduct.stock}</p>
               </div>
             </div>
           </div>

@@ -9,7 +9,7 @@ export interface UpdateCartRequest {
 
 export interface CartItem {
   id: string;
-  userId: string;
+  userId?: string;
   productId: string;
   quantity: number;
   product: {
@@ -17,5 +17,12 @@ export interface CartItem {
     name: string;
     price: number;
     imageUrl?: string;
+    stock?: number;
   };
+}
+export interface GuestCartItem {
+  productId: string;
+  quantity: number;
+  price: number;
+  name: string;
 }

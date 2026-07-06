@@ -1,23 +1,34 @@
 'use client';
 
-import DashboardSidebar from '@/components/user-dashboard/DashboardSidebar';
-import DashboardTopbar from '@/components/user-dashboard/DashboardTopbar';
-import { useState } from 'react';
+import { Toaster } from 'sonner';
+import { usePathname } from 'next/navigation';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-
+  const pathname = usePathname();
+  const getPageTitle = () => {
+ 
+  
+  //if (pathname.includes('/orders')) return 'Order History';
+  if (pathname.includes('/wishlist')) return 'Saved Items';
+  if (pathname.includes('/cart')) return 'Shopping Cart';
+  //if (pathname.includes('/profile')) return 'My Profile';
+  if (pathname.includes('/settings')) return 'Account Settings';
+  if (pathname.includes('/products')) return 'Product Catalog';
+  return ''; // Default title
+};
   return (
-    <div className="flex h-screen bg-slate-50">
-      <DashboardSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <div className="min-h-screen bg-slate-50">
+      <Toaster position="top-right" />
+        <main className="flex-1 overflow-y-auto">
 
-      <div className="flex-1 flex flex-col min-w-0 min-h-0">
-        <DashboardTopbar onMenuClick={() => setSidebarOpen(true)} />
-
-        <main className="flex-1 overflow-y-auto min-h-0z">
-          {children}
+           <div className="max-w-7xl mx-auto  py-6"> 
+            <h1 className="text-sm sm:text-xl font-bold text-slate-800 mb-6">
+              {getPageTitle()}
+            </h1>
+            {children}
+          </div>
         </main>
       </div>
-    </div>
+
   );
 }

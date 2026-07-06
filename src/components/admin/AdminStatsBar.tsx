@@ -24,18 +24,42 @@ export default function AdminStatsBar({ total, verified, admins, feedback, onUse
 
   return (
     <>
-      <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0">
-        <div className="flex items-center gap-2 text-xs font-semibold">
-          <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">Total: {total}</span>
-          <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700">Verified: {verified}</span>
-          <span className="px-2.5 py-1 rounded-full bg-purple-50 text-purple-700">Admins: {admins}</span>
+    <div className="flex items-center justify-between mb-6">
+       <div>
+        <h2 className="text-xl font-bold text-slate-900">Admin User Status</h2>
+        <p className="text-sm text-slate-500">
+         Monitor user accounts and create new users.
+         </p>
         </div>
-        <button
+
+         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-3 py-1.5 bg-orange-700 text-white text-xs font-bold rounded-lg hover:bg-orange-800 transition"
-        >
-          {showForm ? 'Cancel' : '+ New User'}
+          className="px-3 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition"
+         >
+         {showForm ? 'Cancel' : '+ New User'}
         </button>
+      </div>
+     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 items-center">
+        
+        {/* Card 1 */}
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+           <p className="text-[10px] font-bold text-slate-400 uppercase">Total Users</p>
+           <p className="text-2xl font-bold text-slate-800">{total}</p>
+        </div>
+  
+        {/* Card 2 */}
+        <div className="bg-white p-4 rounded-xl border border-emerald-100 shadow-sm">
+          <p className="text-[10px] font-bold text-emerald-600 uppercase">Verified</p>
+          <p className="text-2xl font-bold text-emerald-700">{verified}</p>
+        </div>
+  
+        {/* Card 3 */}
+        <div className="bg-white p-4 rounded-xl border border-purple-100 shadow-sm">
+          <p className="text-[10px] font-bold text-purple-600 uppercase">Admins</p>
+          <p className="text-2xl font-bold text-purple-700">{admins}</p>
+        </div>
+        <div className="flex justify-center lg:justify-end">
+        </div>
       </div>
 
       {showForm && (

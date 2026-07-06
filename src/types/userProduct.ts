@@ -7,4 +7,5 @@ export interface UserProduct {
   images?: string[] | { url: string }[];
   condition: 'NEW' | 'REFURBISHED' | 'HEAVY_DUTY';
   categoryId: string;
+  stock?:number;
 }

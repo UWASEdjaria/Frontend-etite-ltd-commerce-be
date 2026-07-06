@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isAxiosError } from 'axios';
+import { toast } from 'sonner';
 import { createProductSchema } from '@/lib/validations/product';
 import { adminProductService } from '@/services/adminProduct.service';
-import { AdminProduct, Category, FormInputs, ValidationError } from '@/types/product.types';
+import { AdminProduct, Category, FormInputs, ValidationError } from '@/types/adminProduct';
 
 export const ProductForm = ({
   onSuccess,
@@ -31,10 +32,10 @@ export const ProductForm = ({
    values: {
       name: product?.name || '',
       description: product?.description || '',
-      price: product?.price ?? 0,
-      stock: product?.stock ?? 0,
       categoryId: product?.categoryId || '',
       condition: product?.condition || 'NEW',
+      minThreshold: product?.minThreshold ?? 5,
+      maxThreshold: product?.maxThreshold ?? 100,
     },
   });
 
@@ -47,16 +48,15 @@ export const ProductForm = ({
       reset({
         name: product.name || '',
         description: product.description || '',
-        price: product.price ?? 0,
-        stock: product.stock ?? 0,
         categoryId: product.categoryId || '',
         condition: product.condition || 'NEW',
+        minThreshold: product?.minThreshold ?? 5,
+        maxThreshold: product?.maxThreshold ?? 100,
       });
       setImageUrl(product.imageUrl || '');
       setUseUrlInput(!!product.imageUrl);
     } else {
-      // Optional: reset to empty if no product (creating new)
-      reset({ name: '', description: '', price: 0, stock: 0, categoryId: '', condition: 'NEW' });
+      reset({ name: '', description: '', categoryId: '', condition: 'NEW', minThreshold: 5, maxThreshold: 100 });
       setImageUrl('');
       setUseUrlInput(false);
     }
@@ -70,10 +70,10 @@ export const ProductForm = ({
     if (imageFile) formData.append('image', imageFile);
     formData.append('name', data.name);
     formData.append('description', data.description);
-    formData.append('price', String(data.price));
-    formData.append('stock', String(data.stock));
     formData.append('categoryId', data.categoryId);
     formData.append('condition', data.condition || 'NEW');
+    formData.append('minThreshold', String(data.minThreshold ?? 5));
+    formData.append('maxThreshold', String(data.maxThreshold ?? 100));
    
     if (imageUrl) {
     formData.append('imageUrl', imageUrl);
@@ -90,7 +90,7 @@ export const ProductForm = ({
       if (isAxiosError(error) && error.response) {
         const serverError = error.response.data as ValidationError;
         console.error('Submission failed:', serverError.message);
-        alert(`Error: ${serverError.message}`);
+        toast.error(`Error: ${serverError.message}`);
       } else {
         console.error('Submission failed:', error);
       }
@@ -103,41 +103,64 @@ export const ProductForm = ({
         <button type="button" onClick={() => setUseUrlInput(!useUrlInput)} className="text-xs text-orange-600 underline">
           {useUrlInput ? 'Use file upload' : 'Use image URL'}
         </button>
-       {!useUrlInput ? (
-          <input 
-            key="image-file-input"
-            type="file" 
-            accept="image/*" 
-            className={inputClass} 
-            onChange={(e) => setImageFile(e.target.files?.[0] || null)} 
-          />
+        {!useUrlInput ? (
+          <div>
+            <label htmlFor="image-file" className="sr-only">Product image file</label>
+            <input
+              id="image-file"
+              key="image-file-input"
+              type="file"
+              accept="image/*"
+              className={inputClass}
+              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            />
+          </div>
         ) : (
-          <input className={inputClass} placeholder="Image URL" value={imageUrl || ''} onChange={(e) => setImageUrl(e.target.value)} />
+          <div>
+            <label htmlFor="image-url" className="sr-only">Product image URL</label>
+            <input id="image-url" className={inputClass} placeholder="Image URL" value={imageUrl || ''} onChange={(e) => setImageUrl(e.target.value)} />
+          </div>
         )}
       </div>
-
-      <input {...register('name')} defaultValue="" placeholder="Product name" className={inputClass} />
+      <div>
+        <label htmlFor="name" className="sr-only">Product name</label>
+        <input id="name" {...register('name')} defaultValue="" placeholder="Product name" className={inputClass} />
+      </div>
       {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
-
-      <input type="number" {...register('price', { valueAsNumber: true ,
-      setValueAs: (v) => (v === '' ? 0 : Number(v)),})} placeholder="Price" className={inputClass} />
-
-      <input type="number" {...register('stock', { valueAsNumber: true ,
-    setValueAs: (v) => (v === '' ? 0 : Number(v)),})} placeholder="Stock" className={inputClass} />
-      <textarea {...register('description')} defaultValue="" placeholder="Description" className={inputClass} />
-
-      <select {...register('categoryId')} className={inputClass}>
+      <div>
+        <label htmlFor="description" className="sr-only">Description</label>
+        <textarea id="description" {...register('description')} defaultValue="" placeholder="Description" className={inputClass} />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label htmlFor="minThreshold" className="block text-xs text-gray-500 mb-1">Min Threshold</label>
+          <input id="minThreshold" type="number" {...register('minThreshold')} placeholder="Min Threshold" className={inputClass} />
+          {errors.minThreshold && <p className="text-red-500 text-xs mt-1">{errors.minThreshold.message}</p>}
+        </div>
+        <div>
+          <label htmlFor="maxThreshold" className="block text-xs text-gray-500 mb-1">Max Threshold</label>
+          <input id="maxThreshold" type="number" {...register('maxThreshold')} placeholder="Max Threshold" className={inputClass} />
+          {errors.maxThreshold && <p className="text-red-500 text-xs mt-1">{errors.maxThreshold.message}</p>}
+        </div>
+      </div>
+      <div>
+        <label htmlFor="categoryId" className="sr-only">Category</label>
+        <select id="categoryId" {...register('categoryId')} className={inputClass}>
         <option value="">Select category</option>
         {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-      </select>
+        </select>
+      </div>
 
-      <select {...register('condition')} className={inputClass}>
+      <div>
+        <label htmlFor="condition" className="sr-only">Condition</label>
+        <select id="condition" {...register('condition')} className={inputClass}>
         <option value="NEW">New</option>
         <option value="REFURBISHED">Refurbished</option>
         <option value="HEAVY_DUTY">Heavy Duty</option>
-      </select>
+        </select>
+      </div>
 
-      <button type="submit" disabled={isSubmitting} className="w-full bg-orange-700 text-white py-2 rounded-lg">
+      <button type="submit" disabled={isSubmitting} className="w-full bg-orange-500 text-white py-2 rounded-lg">
         {isSubmitting ? 'Saving...' : (isEdit ? 'Update' : 'Create')}
       </button>
     </form>

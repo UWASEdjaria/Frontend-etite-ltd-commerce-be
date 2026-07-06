@@ -1,5 +1,27 @@
+export type PaymentMethod = 'MOMO' | 'DELIVERY';
+
 export interface CreateOrderRequest {
   shippingAddress: string;
+  paymentMethod: PaymentMethod;
+  transactionId?: string;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  items?: {
+    productId: string;
+    quantity: number;
+    price: number;
+  }[];
+}
+export interface OrderItem {
+  id: string;
+  quantity: number;
+  productId: string;
+  price: number;
+  product: {
+    name: string;
+    imageUrl?: string | null;
+  };
 }
 
 export interface OrderResponse {
@@ -7,15 +29,15 @@ export interface OrderResponse {
   userId: string;
   totalAmount: number;
   status: string;
+  shippingAddress: string;
+  paymentMethod: string;
+  transactionId?: string | null;
+  user: {
+    name: string;
+    email: string;
+  };
   createdAt: string;
-  orderItems: Array<{
-    quantity: number;
-    price: number;
-    product: {
-      name: string 
-      imageUrl?: string;
-     };
-  }>;
+  orderItems: OrderItem[];
 }
 
 export interface PaginatedOrdersResponse {

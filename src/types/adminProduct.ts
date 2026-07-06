@@ -3,7 +3,8 @@ export interface AdminProduct {
   name: string;
   description: string;
   stock: number;
-  price: number;
+  minThreshold: number;
+  maxThreshold: number;
   imageUrl?: string;
   condition: 'NEW' | 'REFURBISHED' | 'HEAVY_DUTY';
   categoryId: string;
@@ -14,7 +15,8 @@ export interface CreateProductDTO {
   name: string;
   description: string;
   stock: number;
-  price: number;
+  minThreshold: number;
+  maxThreshold: number;
   categoryId: string;
   condition?: 'NEW' | 'REFURBISHED' | 'HEAVY_DUTY';
 }
@@ -26,8 +28,8 @@ export interface Category {
 export interface FormInputs {
   name: string;
   description: string;
-  price: number;
-  stock: number;
+  minThreshold?: number;
+  maxThreshold?: number;
   categoryId: string;
   condition?: 'NEW' | 'REFURBISHED' | 'HEAVY_DUTY';
 }
