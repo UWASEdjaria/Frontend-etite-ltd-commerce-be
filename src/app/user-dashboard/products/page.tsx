@@ -11,7 +11,11 @@ export default function UserProductsPage() {
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  
+  const [notification, setNotification] = useState<{ message: string; isError: boolean } | null>(null);
+  const handleNotify = (message: string, isError: boolean) => {
+    setNotification({ message, isError });
+    setTimeout(() => setNotification(null), 3000);
+  };
   //Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -47,6 +51,11 @@ export default function UserProductsPage() {
 
   return (
     <div className="p-4 sm:p-6 pb-40 mb-10">
+      {notification && (
+        <div className={`fixed top-20 right-5 z-50 px-6 py-3 rounded-lg text-white font-bold shadow-lg animate-pulse ${notification.isError ? 'bg-red-600' : 'bg-green-600'}`}>
+          {notification.message}
+        </div>
+      )}
       {/* Search & Filter */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1 max-w-sm">
@@ -73,7 +82,9 @@ export default function UserProductsPage() {
       </div>
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8">
         {products.length > 0 ? (
-          products.map((p) => <ProductCard key={p.id} product={p} />)
+          products.map((p) => <ProductCard key={p.id} product={p}
+          onNotify={handleNotify}
+          />)
         ) : (
           <p className="col-span-full text-center text-slate-400 py-16">No products found.</p>
         )}

@@ -3,11 +3,13 @@ import { forwardRef} from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
-  ({ label, type, showPassword, onToggle, id, ...props }, ref) => {
+  ({ label, type, showPassword, onToggle, id, glass, ...props }, ref) => {
     const inputId = id || label.toLowerCase().replace(/\s+/g, '-');
     return (
       <div className="relative mb-2">
-        <label htmlFor={inputId} className="block text-sm font-bold text-gray-700">
+        <label htmlFor={inputId} className={`block text-sm font-bold ${
+        glass ? "text-white/90" : "text-slate-700"
+        }`}>
           {label}
         </label>
 
@@ -17,7 +19,11 @@ const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
           ref={ref}
           type={showPassword ? "text" : type}
           title={label}
-          className="w-full p-2 border rounded-lg border-slate-200 mt-1 text-slate-900 outline-none focus:ring-2 focus:ring-orange-700 focus:border-orange-700"
+          className={`w-full p-3 mt-1 rounded-xl outline-none transition focus:ring-2 focus:ring-orange-400 focus:border-orange-400 ${
+          glass
+          ? "bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder:text-white/50"
+          : "bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400"
+          }`}
         />
 
         {type === "password" && onToggle && (
@@ -25,7 +31,11 @@ const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
             type="button"
             onClick={onToggle}
             aria-label={showPassword ? `Hide ${label}` : `Show ${label}`}
-            className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
+            className={`absolute right-3 top-9 transition ${
+            glass
+            ? "text-white/60 hover:text-orange-400"
+            : "text-slate-400 hover:text-orange-500"
+            }`}
           >
             {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
           </button>

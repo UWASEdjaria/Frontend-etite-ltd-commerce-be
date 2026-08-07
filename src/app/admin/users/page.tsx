@@ -17,25 +17,36 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [feedback, setFeedback] = useState<FeedbackStatus>({ message: '', isError: false });
   const [editUser, setEditUser] = useState<Partial<UserRow> | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [filters, setFilters] = useState<UserFilters>(defaultFilters);
   const [isLoading, setIsLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage]= useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
+ 
+  const fetchUsers = async (page: number) => {
+    setIsLoading(true);
+    try {
+      const data = await authService.getAllUsers(page); 
+      setUsers(data.users);
+      setCurrentPage(data.currentPage);
+      setTotalPages(data.totalPages);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   useEffect(() => {
-    authService.getAllUsers()
-      .then((data) => setUsers(Array.isArray(data) ? data : []))
-      .catch((err: AdminAxiosError) => setFeedback({
-        message: err.response?.data?.message || 'Forbidden: Admin must be active.',
-        isError: true
-      }));
+    fetchUsers(1);
   }, []);
 
   const handleUserCreated = async (data: InviteFormData) => {
     setFeedback({ message: '', isError: false });
     try {
       const newUser = await authService.inviteUser(data);
-      setUsers([...users, newUser]);
+      setUsers([...users, newUser]);// <--- THIS triggers the re-render!
       setFeedback({ message: 'User created successfully!', isError: false });
     } catch (err) {
       setFeedback({ message: (err as AdminAxiosError).response?.data?.message || 'Invitation failed.', isError: true });
@@ -79,14 +90,14 @@ export default function AdminUsersPage() {
     }
   };
 
-  const verified = users.filter((u) => u.isVerified).length;
-  const admins = users.filter((u) => u.role === 'ADMIN').length;
   const filteredUsers = filterUsers(users, filters);
+  const verified = filteredUsers.filter((u) => u.status === 'ACTIVE').length;
+  const admins = filteredUsers.filter((u) => u.role === 'ADMIN').length;
 
   return (
     <div className="flex flex-col gap-6">
        <AdminStatsBar
-          total={users.length}
+          total={filteredUsers.length}
           verified={verified}
           admins={admins}
           feedback={feedback}
@@ -95,8 +106,8 @@ export default function AdminUsersPage() {
 
        <UserFilterBar filters={filters} onChange={setFilters} />
 
-        <div className="flex-1 overflow-y-auto">
-          <table className="w-full text-left text-sm text-gray-600">
+        <div className="flex-1 overflow-y-auto overflow-x-auto">
+          <table className="w-full text-left text-sm text-gray-600 min-w-[500px]">
             <thead className="bg-slate-50 text-slate-400 font-semibold text-xs border-b sticky top-0 z-10">
               <tr>
                 <th className="px-4 sm:px-6 py-3">User</th>
@@ -116,7 +127,7 @@ export default function AdminUsersPage() {
                 <tr key={user.id} className="hover:bg-gray-50/60 transition-colors">
                   <td className="px-4 sm:px-6 py-2.5">
                     <div className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-full bg-orange-100 text-orange-700 font-bold text-xs flex items-center justify-center shrink-0">
+                      <div className="w-7 h-7 rounded-full bg-orange-100 text-orange-500 font-bold text-xs flex items-center justify-center shrink-0">
                         {getInitials(user.name)}
                       </div>
                       <div>

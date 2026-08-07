@@ -24,3 +24,13 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Hide scrollbar only on specific pages */
+body:has(.page-no-scroll) {
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+}
+
+body:has(.page-no-scroll)::-webkit-scrollbar {
+  display: none;
+}

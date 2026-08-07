@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { FiHome, FiShoppingBag, FiHeart, FiPackage, FiSettings, FiX, FiUser, FiShoppingCart } from 'react-icons/fi';
+import { FiHome, FiShoppingBag, FiHeart, FiPackage, FiSettings, FiX, FiUser, FiShoppingCart, FiGrid } from 'react-icons/fi';
 
 import { DashboardSidebarProps } from '@/types/dashboard';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 const navItems = [
-  { icon: FiHome, label: 'user-dashboard', href: '/user-dashboard' },
+  {icon:  FiHome, label:'Home', href: '/'},
+  { icon: FiGrid, label: 'user-dashboard', href: '/user-dashboard' },
   { icon: FiShoppingBag, label: 'Products', href: '/user-dashboard/products' },
   { icon: FiShoppingCart, label: 'Cart', href: '/user-dashboard/cart' },
   { icon: FiPackage, label: 'My Orders', href: '/user-dashboard/orders' },
@@ -21,24 +21,27 @@ export default function DashboardSidebar({ open, onClose }: DashboardSidebarProp
   const pathname = usePathname();
   return (
     <>
+      {/* Dark overlay — mobile only */}
       {open && (
-        <div className="fixed inset-0 bg-black/50 z-20 md:hidden" onClick={onClose} />
+        <div className="fixed inset-0 bg-black/50 z-[190] md:hidden" onClick={onClose} />
       )}
 
-      <aside className={`fixed md:sticky top-0 left-0 h-screen w-56 bg-slate-900 text-white flex flex-col z-30 transform transition-transform duration-200
-        ${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+      {/*
+        MOBILE: fixed overlay, slides in/out based on open state
+        DESKTOP (md+): always visible static sidebar, pushes content right
+      */}
+      <aside className={`
+        fixed top-[64px] left-0 bottom-0 z-[200] w-56 bg-slate-900 text-white flex flex-col z-[200]
+        transform transition-transform duration-200
+        ${open ? 'translate-x-0' : '-translate-x-full'}
+        md:static md:translate-x-0 md:shrink-0
+      `}>
 
         <div className="px-5 py-5 border-b border-slate-700/60 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-orange-700 rounded-lg flex items-center justify-center shrink-0">
-              <span className="text-white text-xs font-extrabold">CP</span>
-            </div>
-            <div>
-              <p className="text-sm font-extrabold tracking-tight text-white leading-none">CONSTRUCTPRO</p>
-              <p className="text-xs text-slate-400 mt-0.5">User Portal</p>
-            </div>
+            
           </div>
-          <button className="md:hidden text-slate-400 hover:text-white" onClick={onClose} aria-label="Close sidebar">
+          <button className="text-slate-400 hover:text-white" onClick={onClose} aria-label="Close sidebar">
             <FiX size={18} />
           </button>
         </div>
