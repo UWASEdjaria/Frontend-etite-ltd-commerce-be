@@ -76,7 +76,7 @@ async deleteUser(id: string):Promise<{ message: string }> {
 }
 
 async getProfile(): Promise<UserProfileResponse> {
-    const { data } = await this.api.post<UserProfileResponse>('/profile/me'); 
+    const { data } = await this.api.post<UserProfileResponse>('/profile/me');
     return data;
   }
   async updateProfile(updatedFields: { name: string; email: string }): Promise<UserProfileResponse> {

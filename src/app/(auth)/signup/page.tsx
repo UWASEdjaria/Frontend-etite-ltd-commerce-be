@@ -26,8 +26,8 @@ export default function RegisterPage() {
       const { confirmPassword, ...registerData } = data;
       void confirmPassword;
       await authService.register(registerData);
-      setFormMessage({ type: 'success', text: 'Account created! Redirecting...' });
-      setTimeout(() => router.push('/login?email=' + data.email), 1500);
+      setFormMessage({ type: 'success', text: 'Account created! Check your email for the verification code.' });
+      setTimeout(() => router.push('/verify?email=' + data.email), 1500);
     } catch (error) {
       const err = error as AuthError;
       setFormMessage({ type: 'error', text: err.response?.data?.message || 'Registration failed.' });

@@ -7,7 +7,8 @@ import { useEffect, useState, useCallback } from "react";
 import { cartService } from "@/services/cartService";
 import { AxiosError } from 'axios';
 import { wishlistService } from "@/services/wishlistService";
-import { FiHeart } from 'react-icons/fi';
+import { FiHeart, FiArrowLeft } from 'react-icons/fi';
+import Link from 'next/link';
 import { getGuestCart, saveGuestCart } from "@/utils/guestCart";
 
 export default function ProductDetailPage() {
@@ -112,6 +113,9 @@ const addToWishlist = async () => {
   };
   return (
   <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
+    <Link href="/user-dashboard/products" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-orange-500 transition font-medium">
+      <FiArrowLeft size={15} /> Back to Products
+    </Link>
     {notification && (
       <div
         className={`fixed top-20 right-4 z-50 px-4 sm:px-6 py-3 rounded-lg text-white font-bold shadow-lg animate-pulse text-sm ${

@@ -13,6 +13,7 @@ const STATUS_STYLES: Record<StockStatus, string> = {
   LOW: 'bg-yellow-100 text-yellow-800',
   OUT_OF_STOCK: 'bg-red-100 text-red-800',
   OVERSTOCK: 'bg-blue-100 text-blue-800',
+  EXPIRED: 'bg-red-200 text-red-900',
 };
 
 const STATUS_LABELS: Record<StockStatus, string> = {
@@ -20,6 +21,7 @@ const STATUS_LABELS: Record<StockStatus, string> = {
   LOW: 'Low Stock',
   OUT_OF_STOCK: 'Out of Stock',
   OVERSTOCK: 'Overstock',
+  EXPIRED: 'Expired',
 };
 
 export default function StockPage() {
@@ -30,6 +32,7 @@ export default function StockPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StockStatus | 'ALL'>('ALL');
 
   const load = useCallback(async (page: number = 1) => {
     try {
@@ -67,7 +70,16 @@ export default function StockPage() {
         </button>
       </div>
 
-      <div className="relative max-w-sm mb-4">
+      {stocks.filter(s => s.status === 'EXPIRED').length > 0 && (
+        <div className="mb-4 flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          <span className="font-bold">⚠ {stocks.filter(s => s.status === 'EXPIRED').length} expired batch{stocks.filter(s => s.status === 'EXPIRED').length > 1 ? 'es' : ''}</span>
+          <span className="text-red-500">on this page — these cannot be sold and should be removed.</span>
+          <button onClick={() => setStatusFilter('EXPIRED')} className="ml-auto text-xs underline font-semibold">Show only expired</button>
+        </div>
+      )}
+
+      <div className="flex gap-3 mb-4 flex-wrap">
+        <div className="relative max-w-sm flex-1">
         <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
         <input
           type="text"
@@ -76,6 +88,17 @@ export default function StockPage() {
           onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
           className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
         />
+        </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => { setStatusFilter(e.target.value as StockStatus | 'ALL'); setCurrentPage(1); }}
+          className="border border-slate-200 rounded-lg text-sm text-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+        >
+          <option value="ALL">All Statuses</option>
+          {(Object.keys(STATUS_LABELS) as StockStatus[]).map(s => (
+            <option key={s} value={s}>{STATUS_LABELS[s]}</option>
+          ))}
+        </select>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-x-auto">
@@ -89,9 +112,12 @@ export default function StockPage() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {stocks
-              .filter((s) => s.productName.toLowerCase().includes(search.toLowerCase()))
+              .filter((s) =>
+                s.productName.toLowerCase().includes(search.toLowerCase()) &&
+                (statusFilter === 'ALL' || s.status === statusFilter)
+              )
               .map((s) => (
-              <tr key={s.id} className="hover:bg-gray-50 transition-colors">
+              <tr key={s.id} className={`transition-colors ${s.status === 'EXPIRED' ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-gray-50'}`}>
                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">{s.productName}</td>
                 <td className="px-4 py-3 text-gray-500 font-mono text-xs">{s.batchCode || '—'}</td>
                 <td className="px-4 py-3 text-gray-500 font-mono">{s.quantity}</td>

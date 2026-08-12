@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FiTool } from 'react-icons/fi';
+import { Building2 } from 'lucide-react';
 
 interface LogoProps {
   variant?: 'dark' | 'light';
@@ -9,19 +9,31 @@ interface LogoProps {
 
 export default function Logo({ variant = 'dark', href = '/', subtitle }: LogoProps) {
   const textColor = variant === 'light' ? 'text-white' : 'text-slate-900';
-  const subtitleColor = variant === 'light' ? 'text-slate-400' : 'text-slate-500';
+  const subtitleColor = variant === 'light' ? 'text-orange-300' : 'text-orange-500';
 
   const content = (
-    <div className="flex items-center gap-2">
-      <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center shrink-0">
-        <FiTool size={16} className="text-white" />
+    <div className="flex items-center gap-2.5">
+      {/* Shield emblem */}
+      <div className="relative w-9 h-10 shrink-0">
+        {/* Shield shape using clip-path */}
+        <div
+          className="w-full h-full bg-orange-500 flex items-center justify-center"
+          style={{ clipPath: 'polygon(50% 0%, 100% 15%, 100% 60%, 50% 100%, 0% 60%, 0% 15%)' }}
+        >
+          <Building2 size={18} className="text-white" strokeWidth={2} />
+        </div>
       </div>
-      <div>
-        <p className={`text-base font-extrabold tracking-tight leading-none ${textColor}`}>
-          CONSTRUCTPRO
-        </p>
+
+      {/* Text */}
+      <div className="flex flex-col leading-none">
+        <span className={`text-base font-black tracking-widest uppercase ${textColor}`}>
+          Construct
+        </span>
+        <span className="text-base font-black tracking-widest uppercase text-orange-500">
+          Pro
+        </span>
         {subtitle && (
-          <p className={`text-xs mt-0.5 ${subtitleColor}`}>{subtitle}</p>
+          <span className={`text-xs mt-0.5 ${subtitleColor}`}>{subtitle}</span>
         )}
       </div>
     </div>

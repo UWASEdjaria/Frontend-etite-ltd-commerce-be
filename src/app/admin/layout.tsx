@@ -4,7 +4,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Toaster } from 'sonner';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminTopbar from '@/components/admin/AdminTopbar';
-import AdminNotificationManager from '@/components/admin/AdminNotificationManager';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -41,8 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <AdminTopbar onMenuClick={() => setSidebarOpen(prev => !prev)} title={getPageTitle()} />
       <div className="flex flex-1 min-h-0">
         <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <AdminNotificationManager />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <main className="flex-1 overflow-y-auto px-4 sm:px-8 py-4">
           <div className="max-w-7xl mx-auto"> 
             <h1 className="text-sm sm:text-1xl font-bold text-slate-800 mb-6">
               {getPageTitle()}

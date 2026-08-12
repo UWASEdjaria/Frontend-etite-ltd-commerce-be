@@ -1,4 +1,4 @@
-export type StockStatus = 'NORMAL' | 'LOW' | 'OUT_OF_STOCK' | 'OVERSTOCK';
+export type StockStatus = 'NORMAL' | 'LOW' | 'OUT_OF_STOCK' | 'OVERSTOCK' | 'EXPIRED';
 
 export interface IStockItem {
   id: string;
