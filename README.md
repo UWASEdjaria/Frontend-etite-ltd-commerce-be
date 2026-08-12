@@ -76,7 +76,7 @@ pnpm install
 2. Create `.env.local`
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=https://commerce-be-3-5gsc.onrender.com
 NEXT_PUBLIC_FLW_PUBLIC_KEY=your_flutterwave_key
 ```
 

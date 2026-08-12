@@ -6,7 +6,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://commerce-be-3-5gsc.o
 
 export class UserProductService {
     async getAll(filters?: { name?: string; categoryId?: string;page?: number }): Promise<{ data: UserProduct[]; totalPages: number }> {
-    const { data } = await axios.get(`${API_URL}/products`, { params: filters });
+    const { data } = await axios.get(`${API_URL}`, { params: filters });
     return data;
   }
 
