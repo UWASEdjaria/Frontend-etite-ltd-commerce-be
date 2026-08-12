@@ -19,9 +19,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen bg-slate-50">
       <Toaster position="top-right" />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6">
 
-           <div className="max-w-7xl mx-auto  py-6"> 
+           <div className="max-w-7xl mx-auto py-6"> 
             <h1 className="text-sm sm:text-xl font-bold text-slate-800 mb-6">
               {getPageTitle()}
             </h1>

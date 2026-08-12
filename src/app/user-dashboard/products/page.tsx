@@ -11,6 +11,8 @@ export default function UserProductsPage() {
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [notification, setNotification] = useState<{ message: string; isError: boolean } | null>(null);
   const handleNotify = (message: string, isError: boolean) => {
     setNotification({ message, isError });
@@ -24,6 +26,8 @@ export default function UserProductsPage() {
   // 2. Fetch products whenever search or category changes
   
     const fetchProducts = useCallback(async (page: number) => {
+      setLoading(true);
+      setError(false);
       try {
         const response = await adminProductService.getAll({ 
           name: searchTerm, 
@@ -35,6 +39,9 @@ export default function UserProductsPage() {
       } catch (err) {
         console.error('FETCH ERROR:', err);
         setProducts([]);
+        setError(true);
+      } finally {
+        setLoading(false);
       }
   }, [searchTerm, categoryId]);
 
@@ -81,10 +88,18 @@ export default function UserProductsPage() {
         </select>
       </div>
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8">
-        {products.length > 0 ? (
-          products.map((p) => <ProductCard key={p.id} product={p}
-          onNotify={handleNotify}
-          />)
+        {loading ? (
+          <div className="col-span-full flex flex-col items-center justify-center py-20 gap-3">
+            <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+            <p className="text-slate-400 text-sm">Loading products...</p>
+          </div>
+        ) : error ? (
+          <div className="col-span-full text-center py-16">
+            <p className="text-red-400 font-semibold">Failed to load products.</p>
+            <button onClick={() => fetchProducts(currentPage)} className="mt-3 text-sm text-orange-500 underline">Try again</button>
+          </div>
+        ) : products.length > 0 ? (
+          products.map((p) => <ProductCard key={p.id} product={p} onNotify={handleNotify} />)
         ) : (
           <p className="col-span-full text-center text-slate-400 py-16">No products found.</p>
         )}

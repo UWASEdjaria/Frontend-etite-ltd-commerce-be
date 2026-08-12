@@ -180,7 +180,7 @@ export default function HomePage() {
               />
             ))
           ) : (
-            <p className="col-span-full text-center text-slate-400 py-16">No products found.</p>
+            <p className="col-span-full text-center text-slate-400 py-16">Loading products...</p>
           )}
         </div>
 

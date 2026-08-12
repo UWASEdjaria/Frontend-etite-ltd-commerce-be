@@ -25,7 +25,7 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
     <>
       {/* Dark overlay — mobile only */}
       {open && (
-        <div className="fixed inset-0 bg-black/50 z-[190] md:hidden" onClick={onClose} />
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[40] md:hidden" onClick={onClose} />
       )}
 
       {/*
@@ -33,7 +33,7 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
         DESKTOP (md+): always visible static sidebar, pushes content right
       */}
       <aside className={`
-        fixed top-[64px] left-0 bottom-0 z-[40] w-56 bg-white border-r border-slate-200 text-slate-700 flex flex-col
+        fixed top-[64px] left-0 bottom-0 z-[50] w-56 bg-white border-r border-slate-200 text-slate-700 flex flex-col
         transform transition-transform duration-200
         ${open ? 'translate-x-0' : '-translate-x-full'}
         md:static md:translate-x-0 md:shrink-0
