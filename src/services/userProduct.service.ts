@@ -2,7 +2,7 @@ import { UserProduct } from '@/types/userProduct';
 import axios from 'axios';
 
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://commerce-be-3-5gsc.onrender.com/';
 
 export class UserProductService {
     async getAll(filters?: { name?: string; categoryId?: string;page?: number }): Promise<{ data: UserProduct[]; totalPages: number }> {
