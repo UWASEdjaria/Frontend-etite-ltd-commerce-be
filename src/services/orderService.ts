@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { CreateOrderRequest,OrderResponse, PaginatedOrdersResponse } from '@/types/order';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://frontend-etite-ltd-commerce-be.vercel.app/';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://frontend-etite-ltd-commerce-be.vercel.app';
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   if (!token || token === 'undefined' || token === 'null') {

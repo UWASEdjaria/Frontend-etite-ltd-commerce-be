@@ -7,7 +7,7 @@ class AuthService {
 
   constructor() {
     this.api = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://commerce-be-3-5gsc.onrender.com/',
+      baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://commerce-be-3-5gsc.onrender.com',
     });
 
     this.api.interceptors.request.use(

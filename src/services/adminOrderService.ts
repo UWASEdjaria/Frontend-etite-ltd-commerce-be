@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { OrderResponse, PaginatedOrdersResponse } from '../types/order';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://commerce-be-3-5gsc.onrender.com';
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
